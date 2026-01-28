@@ -6,7 +6,7 @@ class Contact(models.Model):
     """
     Represents a contact stored in the agenda, containing personal
     and communication information such as name, phone number,
-    email, description, and creation date.
+    email, description, show, picture, and creation date.
     """
 
     first_name = models.CharField(
@@ -34,6 +34,15 @@ class Contact(models.Model):
     description = models.TextField(
         blank=True,
         help_text="Additional notes or description about the contact (optional)"
+    )
+    show = models.BooleanField(
+        default=True,
+        help_text="Whether to show the contact in the agenda"
+    )
+    picture = models.ImageField(
+        blank=True,
+        upload_to='pictures/%Y/%m/',
+        help_text="Profile picture of the contact (optional)"
     )
 
     def __str__(self):
