@@ -10,7 +10,7 @@ class ContactAdmin(admin.ModelAdmin):
     ordering, and pagination for the Django Admin interface.
     """
     list_display = (
-        'id', 'first_name', 'last_name', 'phone', 'email', 'created_date'
+        'id', 'first_name', 'last_name', 'phone', 'email', 'category', 'created_date'
     )
     ordering = (
         '-id',
@@ -19,10 +19,20 @@ class ContactAdmin(admin.ModelAdmin):
         'created_date',
     )
     search_fields = (
-        'first_name', 'last_name', 'phone', 'email'
+        'first_name', 'last_name', 'phone', 'email',
     )
     list_display_links = (
         'id', 'first_name',
     )
     list_per_page = 10
     list_max_show_all = 100
+
+@admin.register(models.Category)
+class CategoryAdmin(admin.ModelAdmin):
+    """
+    Admin configuration for the Category model.
+    Defines how categories are displayed and ordered
+    in the Django Admin interface.
+    """
+    list_display = ('name',)
+    ordering = ('-id',)

@@ -2,6 +2,20 @@ from django.db import models
 from django.utils import timezone
 
 
+class Category(models.Model):
+    """
+    Represents a category used to group contacts in the agenda.
+    """
+    name = models.CharField(max_length=50, unique=True)
+
+
+    def __str__(self):
+        """
+        Returns the string representation of the category.
+        """
+        return self.name
+
+
 class Contact(models.Model):
     """
     Represents a contact stored in the agenda, containing personal
@@ -44,6 +58,14 @@ class Contact(models.Model):
         upload_to='pictures/%Y/%m/',
         help_text="Profile picture of the contact (optional)"
     )
+    category = models.ForeignKey(
+        Category,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        help_text="Category of the contact (optional)"
+    )
+
 
     def __str__(self):
         """
