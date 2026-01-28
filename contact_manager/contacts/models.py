@@ -9,6 +9,11 @@ class Category(models.Model):
     name = models.CharField(max_length=50, unique=True)
 
 
+    class Meta:
+        verbose_name = "Category"
+        verbose_name_plural = "Categories"
+
+
     def __str__(self):
         """
         Returns the string representation of the category.
