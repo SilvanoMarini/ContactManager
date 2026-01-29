@@ -10,13 +10,13 @@ class ContactAdmin(admin.ModelAdmin):
     ordering, and pagination for the Django Admin interface.
     """
     list_display = (
-        'id', 'first_name', 'last_name', 'phone', 'email', 'category', 'created_date'
+        'id', 'first_name', 'last_name', 'phone', 'email', 'created_date', 'show',
     )
     ordering = (
         '-id',
     )
     list_filter = (
-        'created_date',
+        'show',
     )
     search_fields = (
         'first_name', 'last_name', 'phone', 'email',
@@ -24,6 +24,7 @@ class ContactAdmin(admin.ModelAdmin):
     list_display_links = (
         'id', 'first_name',
     )
+    list_editable = ('show',)
     list_per_page = 10
     list_max_show_all = 100
 
