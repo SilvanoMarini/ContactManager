@@ -8,7 +8,8 @@ def index(request):
         .order_by('first_name', 'last_name')
 
     context = {
-        'contacts': contacts
+        'contacts': contacts,
+        'site_title': 'Contacts | '
     }
 
     return render(
@@ -22,7 +23,8 @@ def contact(request, contact_id):
     sigle_contact = get_object_or_404(Contact, pk=contact_id, show=True)
 
     context = {
-        'contact': sigle_contact
+        'contact': sigle_contact,
+        'site_title': f'{sigle_contact} | '
     }
 
     return render(
