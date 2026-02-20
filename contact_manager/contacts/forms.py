@@ -9,6 +9,9 @@ class ContactForm(forms.ModelForm):
         fields = ['first_name', 'last_name', 'phone',
                   'email', 'description', 'category',]
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def clean(self):
         return super().clean()
 
