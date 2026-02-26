@@ -1,7 +1,9 @@
 from django.shortcuts import render, redirect
-from contacts.forms import RegisterForm
+from contacts.forms import RegisterForm, RegisterUpdateForm
 from django.contrib import messages, auth
 from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import update_session_auth_hash
 
 
 def register(request):
@@ -53,3 +55,30 @@ def logout_view(request):
     auth.logout(request)
     messages.success(request, 'User successfully logged out.')
     return redirect('contacts:login')
+
+
+@login_required
+def user_update(request):
+    form = RegisterUpdateForm(instance=request.user)
+
+    if request.method == 'POST':
+        form = RegisterUpdateForm(request.POST, instance=request.user)
+        if form.is_valid():
+            user = form.save()
+
+            if form.cleaned_data.get('password1'):
+                update_session_auth_hash(request, user)
+
+            messages.success(request, 'User successfully updated.')
+            return redirect('contacts:user_update')
+
+        messages.error(request, 'Invalid data')
+
+    return render(
+        request,
+        'contacts/user_update.html',
+        context={
+            'site_title': 'Update User | ',
+            'form': form
+        }
+    )

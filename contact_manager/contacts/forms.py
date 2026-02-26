@@ -3,6 +3,7 @@ from contacts.models import Contact
 from django.core.exceptions import ValidationError
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from django.contrib.auth import password_validation
 
 
 class ContactForm(forms.ModelForm):
@@ -119,3 +120,102 @@ class RegisterForm(UserCreationForm):
         if User.objects.filter(email=email).exists():
             raise ValidationError('Email already exists.')
         return email
+
+
+class RegisterUpdateForm(forms.ModelForm):
+    first_name = forms.CharField(
+        max_length=50,
+        min_length=2,
+        required=True,
+        help_text=(
+            'First name of the user'
+        ),
+    )
+
+    last_name = forms.CharField(
+        max_length=50,
+        min_length=2,
+        required=True,
+        help_text=(
+            'Last name of the user'
+        ),
+    )
+
+    email = forms.EmailField(
+        max_length=254,
+        required=True,
+        help_text=(
+            'Email address of the user'
+        ),
+    )
+
+    password1 = forms.CharField(
+        required=False,
+        label='Password',
+        strip=False,
+        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password'}),
+        help_text=password_validation.password_validators_help_text_html(),
+    )
+
+    password2 = forms.CharField(
+        label='Password confirmation',
+        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password'}),
+        strip=False,
+        help_text='Enter the same password as before, for verification.',
+        required=False
+    )
+
+    class Meta:
+        model = User
+        fields = (
+            'first_name',
+            'last_name',
+            'email',
+            'username',
+        )
+
+    def save(self, commit=True):
+        cleaned_data = self.cleaned_data
+        user = super().save(commit=False)
+
+        password = cleaned_data.get('password1')
+
+        if password:
+            user.set_password(password)
+        if commit:
+            user.save()
+
+        return user
+
+    def clean(self):
+        cleaned_data = super().clean()
+        password1 = cleaned_data.get('password1')
+        password2 = cleaned_data.get('password2')
+
+        if password1 or password2:
+            if password1 != password2:
+                self.add_error('password2', 'Passwords do not match.')
+
+        return cleaned_data
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        current_email = self.instance.email
+
+        if email != current_email:
+            if User.objects.filter(email=email).exists():
+                raise ValidationError('Email already exists.')
+            return email
+
+        return email
+
+    def clean_password1(self):
+        password1 = self.cleaned_data.get('password1')
+
+        if password1:
+            try:
+                password_validation.validate_password(password1)
+            except ValidationError as error:
+                self.add_error('password1', error)
+
+        return password1
