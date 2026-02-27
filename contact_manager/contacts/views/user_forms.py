@@ -22,6 +22,7 @@ def register(request):
         context={
             'site_title': 'Register User | ',
             'form': form,
+            'send': 'Register',
 
         }
     )
@@ -47,6 +48,7 @@ def login_view(request):
         context={
             'site_title': 'Login User | ',
             'form': form,
+            'send': 'Login',
         }
     )
 
@@ -80,6 +82,7 @@ def user_update(request):
         'contacts/user_update.html',
         context={
             'site_title': 'Update User | ',
-            'form': form
+            'form': form,
+            'send': 'Update',
         }
     )

@@ -3,6 +3,7 @@ from django.urls import reverse
 from contacts.forms import ContactForm
 from contacts.models import Contact
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
 
 @login_required
@@ -14,10 +15,15 @@ def create(request):
         context = {
             'site_title': ' Create Contact | ',
             'form': form,
+
+
         }
 
         if form.is_valid():
-            contact = form.save()
+            contact = form.save(commit=False)
+            contact.owner = request.user
+            contact.save()
+            messages.success(request, 'Contact successfully created.')
             return redirect('contacts:update', contact_id=contact.pk)
 
         return render(
@@ -29,7 +35,8 @@ def create(request):
     context = {
         'site_title': ' Create Contact | ',
         'form': ContactForm(),
-        'form_action': form_action
+        'form_action': form_action,
+        'send': 'create',
     }
 
     return render(
@@ -41,7 +48,9 @@ def create(request):
 
 @login_required
 def update(request, contact_id):
-    contact = get_object_or_404(Contact, pk=contact_id, show=True)
+    contact = get_object_or_404(
+        Contact, pk=contact_id, show=True, owner=request.user
+    )
     form_action = reverse('contacts:update', args=(contact_id,))
 
     if request.method == 'POST':
@@ -54,6 +63,7 @@ def update(request, contact_id):
 
         if form.is_valid():
             contact = form.save()
+            messages.success(request, 'Contact successfully updated.')
             return redirect('contacts:update', contact_id=contact.pk)
 
         return render(
@@ -65,7 +75,8 @@ def update(request, contact_id):
     context = {
         'site_title': ' Update Contact | ',
         'form': ContactForm(instance=contact),
-        'form_action': form_action
+        'form_action': form_action,
+        'send': 'update',
     }
 
     return render(
@@ -77,12 +88,15 @@ def update(request, contact_id):
 
 @login_required
 def delete(request, contact_id):
-    contact = get_object_or_404(Contact, pk=contact_id, show=True)
+    contact = get_object_or_404(
+        Contact, pk=contact_id, show=True, owner=request.user
+    )
     confirmation = request.POST.get('confirmation', 'no')
     print('confirmation', confirmation)
 
     if confirmation == 'yes':
         contact.delete()
+        messages.success(request, 'Contact successfully deleted.')
         return redirect('contacts:index')
 
     return render(
