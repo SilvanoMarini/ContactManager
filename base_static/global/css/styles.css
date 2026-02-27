@@ -118,7 +118,8 @@ svg {
 .contacts-table {
   width: 100%;
   min-width: var(--table-min-width);
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0 6px;
 }
 
 .contact-links {
@@ -156,6 +157,16 @@ svg {
 .table-cel,
 .table-header {
   padding: var(--spacing);
+}
+
+.clickable-row {
+  cursor: pointer;
+  transition: background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.clickable-row:hover {
+  background-color: #f8f9fa;
+  box-shadow: inset 4px 0 0 var(--link-dark-color);
 }
 
 .table-link {
