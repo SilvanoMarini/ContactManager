@@ -127,6 +127,17 @@ STATIC_ROOT = BASE_DIR / 'static'  # collectstatic
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+# ===========================
+# Authentication Settings
+# ===========================
+# Defines the authentication flow:
+# - LOGIN_URL: redirect for unauthenticated users
+# - LOGIN_REDIRECT_URL: default redirect after successful login
+# - LOGOUT_REDIRECT_URL: redirect after logout
+LOGIN_URL = 'contacts:login'
+LOGIN_REDIRECT_URL = 'contacts:index'
+LOGOUT_REDIRECT_URL = 'contacts:login'
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/6.0/ref/settings/#default-auto-field
 

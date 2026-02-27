@@ -35,10 +35,10 @@ def login_view(request):
         if form.is_valid():
             user = form.get_user()
             auth.login(request, user)
-            print(user)
             messages.success(request, 'User successfully logged in.')
-            return redirect('contacts:index')
 
+            next_url = request.GET.get('next')
+            return redirect(next_url if next_url else 'contacts:index')
         messages.error(request, 'Invalid username or password.')
 
     return render(
@@ -51,6 +51,7 @@ def login_view(request):
     )
 
 
+@login_required
 def logout_view(request):
     auth.logout(request)
     messages.success(request, 'User successfully logged out.')
