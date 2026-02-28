@@ -1,0 +1,38 @@
+{% extends 'global/base.html' %}
+
+{% block content %}
+<section class="hero">
+  <div class="hero-content">
+    <h1>Contact Manager</h1>
+    <p>
+      A Django-based contact management system demonstrating 
+      authentication, CRUD operations, pagination, and deployment.
+    </p>
+
+    <div class="hero-buttons">
+      <a href="{% url 'contacts:index' %}" class="btn-primary">
+        View Contacts
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="features">
+  <div class="features-container">
+    <div class="feature-card">
+      <h3>Authentication</h3>
+      <p>User login & permission-based access control.</p>
+    </div>
+
+    <div class="feature-card">
+      <h3>CRUD Operations</h3>
+      <p>Create, read, update and delete contacts.</p>
+    </div>
+
+    <div class="feature-card">
+      <h3>Production Deployment</h3>
+      <p>Live hosted on Render.</p>
+    </div>
+  </div>
+</section>
+{% endblock %}

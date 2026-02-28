@@ -5,7 +5,8 @@ from contacts import views
 app_name = 'contacts'
 
 urlpatterns = [
-    path('', views.index, name='index'),
+    path('', views.home, name='home'),
+    path('contacts/', views.index, name='index'),
     path('search/', views.search, name='search'),
 
     # contact(CRUD)

@@ -73,3 +73,13 @@ def search(request):
         'contacts/index.html',
         context=context
     )
+
+
+def home(request):
+    return render(
+        request,
+        'contacts/home.html',
+        context={
+            'site_title': 'Home | '
+        }
+    )
