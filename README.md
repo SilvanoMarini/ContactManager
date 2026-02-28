@@ -2,10 +2,13 @@ Contact Manager
 ===============
 
 A simple yet full-featured **Django-based contact management application**.  
-It allows authenticated users to create, view, update, delete, and search contacts, with support for categories and optional profile pictures.
+It allows authenticated users to create, view, update, delete, and search contacts, with support for categories and optional profile pictures. Includes a **landing page**, production-ready static files (WhiteNoise), and optional deployment on **Render** with PostgreSQL.
+
+> **Portfolio project** — This is **not a commercial product**. It is a **demonstration project** for portfolio purposes, showcasing Django skills and practices.
 
 ### Features
 
+- **Landing page** – Home at `/` with hero section and feature highlights
 - **Contact CRUD**
   - Create, read, update, and delete contacts
   - Fields include first name, last name, phone, email, description, picture, and creation date
@@ -20,7 +23,8 @@ It allows authenticated users to create, view, update, delete, and search contac
 - **Visibility Control**
   - Flag to show/hide contacts from the main list
 - **Profile Pictures**
-  - Optional image upload for each contact
+  - Optional image upload for each contact (Pillow)
+- **Seed data** – Management command to populate the database with fake contacts (Faker)
 
 ---
 
@@ -28,8 +32,11 @@ It allows authenticated users to create, view, update, delete, and search contac
 
 - **Language**: Python
 - **Framework**: Django
-- **Database**: SQLite (default Django configuration; can be changed)
-- **Templates**: Django Template Language (DTL)
+- **Database**: SQLite (local) / PostgreSQL (production, e.g. Render)
+- **Templates**: Django Template Language (DTL), global base in `base_templates/`
+- **Static files**: WhiteNoise (production), global CSS in `base_static/`
+- **Production server**: Gunicorn
+- **Other**: dj-database-url, Pillow (images), Faker (seed data)
 
 ---
 
@@ -37,11 +44,20 @@ It allows authenticated users to create, view, update, delete, and search contac
 
 - `manage.py` – Django management script
 - `contact_manager/` – Django project configuration (settings, URLs, WSGI/ASGI)
+  - `settings.py` – Base config; production uses env vars and `dj_database_url`
+  - `local_settings.py` – Local overrides (SECRET_KEY, DEBUG, ALLOWED_HOSTS); not committed
+- `base_templates/` – Global templates
+  - `global/base.html` – Base layout
+  - `global/partials/` – _head, _header, _footer, _messages, _pagination
+- `base_static/` – Global static files (e.g. `global/css/styles.css`)
 - `contacts/` – Main application
   - `models.py` – `Category` and `Contact` models
-  - `views/` – Views for listing, searching, CRUD, and user actions
+  - `views/` – Views for home, listing, searching, CRUD, and user actions
   - `urls.py` – App URL routes
-  - `templates/contacts/` – HTML templates (list, detail, forms, etc.)
+  - `templates/contacts/` – HTML templates (home, index, contact, forms, etc.)
+  - `management/commands/seed.py` – `python manage.py seed` to populate fake contacts
+- `utils/create_contacts_faker.py` – Standalone script to generate many fake contacts (optional)
+- `requirements.txt` – Python dependencies (Django, WhiteNoise, Gunicorn, Pillow, Faker, etc.)
 
 ---
 
@@ -74,27 +90,21 @@ source .venv/bin/activate
 
 ### 3. Install dependencies
 
-If you already have a `requirements.txt` file:
-
 ```bash
 pip install -r requirements.txt
 ```
 
-Otherwise, install at least:
+This installs Django, WhiteNoise, Gunicorn, Pillow, Faker, dj-database-url, psycopg2-binary, and other dependencies (see `requirements.txt`).
 
-```bash
-pip install django
-```
+### 4. Configure environment (local development)
 
-### 4. Configure environment variables (optional but recommended)
+For local development, the project uses `contact_manager/local_settings.py` (not in version control) to override:
 
-In production or advanced setups, you should configure:
+- `SECRET_KEY`
+- `DEBUG = True`
+- `ALLOWED_HOSTS = []`
 
-- `DJANGO_SECRET_KEY`
-- `DEBUG` (set to `False` in production)
-- `ALLOWED_HOSTS`
-
-You can store these in a `.env` file and load them in your settings if desired.
+Create `contact_manager/local_settings.py` with your local values, or the app may fall back to base settings (which expect env vars and are aimed at production).
 
 ### 5. Apply migrations
 
@@ -116,37 +126,47 @@ Follow the interactive prompts to set username, email, and password.
 python manage.py runserver
 ```
 
-The application will be available at `http://127.0.0.1:8000/`.
+The application will be available at `http://127.0.0.1:8000/`. You’ll see the **landing page** first; use “View Contacts” or go to `/contacts/` for the contact list.
+
+### 8. (Optional) Seed the database with fake contacts
+
+```bash
+python manage.py seed
+```
+
+This creates categories (Friends, Family, Work) and 40 fake contacts using Faker (pt_BR). It skips if contacts already exist.
 
 ---
 
 ## Usage
 
-1. Open `http://127.0.0.1:8000/` in your browser.
-2. Register a new user or log in with an existing account.
-3. Create new contacts via the **Create Contact** page.
-4. Use the search bar to find contacts by name, phone, or email.
-5. Click on a contact to view its detailed page.
-6. Edit or delete contacts as needed.
+1. Open `http://127.0.0.1:8000/` in your browser (landing page).
+2. Use **View Contacts** or go to `/contacts/` for the contact list.
+3. Register a new user or log in with an existing account.
+4. Create new contacts via the **Create Contact** page.
+5. Use the search bar to find contacts by name, phone, or email.
+6. Click on a contact to view its detailed page.
+7. Edit or delete contacts as needed.
 
 ---
 
 ## URL Overview
 
-These are the main routes defined by the `contacts` app:
+Routes defined by the `contacts` app (namespace `contacts:`):
 
-- `/` – Contact list (index)
-- `/search/` – Contact search
-- `/contact/<id>/` – Contact detail
-- `/contact/create/` – Create new contact
-- `/contact/<id>/update/` – Update existing contact
-- `/contact/<id>/delete/` – Delete contact
-- `/user/create/` – User registration
-- `/user/login/` – User login
-- `/user/logout/` – User logout
-- `/user/update/` – User profile update
-
-Note: Routes may be namespaced under `contacts:` in Django templates and redirects.
+| Path | Name | Description |
+|------|------|-------------|
+| `/` | `home` | Landing page |
+| `/contacts/` | `index` | Contact list (paginated) |
+| `/search/` | `search` | Contact search |
+| `/contact/<id>/` | `contact` | Contact detail |
+| `/contact/create/` | `create` | Create new contact |
+| `/contact/<id>/update/` | `update` | Update contact |
+| `/contact/<id>/delete/` | `delete` | Delete contact |
+| `/user/create/` | `register` | User registration |
+| `/user/login/` | `login` | User login |
+| `/user/logout/` | `logout` | User logout |
+| `/user/update/` | `user_update` | User profile update |
 
 ---
 
@@ -179,18 +199,21 @@ python manage.py test
 
 ## Deployment Notes
 
-- Set `DEBUG = False` in production.
-- Configure `ALLOWED_HOSTS` properly.
-- Use a production-ready database (e.g., PostgreSQL) instead of SQLite.
-- Serve static and media files via a proper web server (Nginx, Apache, etc.).
-- Use a WSGI/ASGI server like Gunicorn or uWSGI for production.
+The project is set up for deployment on **Render** (or similar):
+
+- **Base settings** use environment variables: `SECRET_KEY`, `DEBUG`, and `ALLOWED_HOSTS` (e.g. `.onrender.com`).
+- **Database**: `dj-database-url` reads `DATABASE_URL` (PostgreSQL on Render); locally defaults to SQLite.
+- **Static files**: WhiteNoise serves static files; `STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'`.
+- **WSGI**: Use Gunicorn as the process command, e.g. `gunicorn contact_manager.wsgi:application`.
+- Set `DEBUG = False` in production and configure `ALLOWED_HOSTS` for your domain.
+- Serve media uploads via a persistent volume or external storage if required.
 
 ---
 
 ## License
 
-This project is provided as-is for learning and personal use.  
-You can adapt it to your needs; if you plan to publish it, consider adding an explicit license (e.g., MIT, BSD, etc.).
+This project is **not a product** — it is a **portfolio demonstration** for learning and showcasing skills.  
+Provided as-is; you can adapt it to your needs. If you plan to publish derivatives, consider adding an explicit license (e.g., MIT, BSD).
 
 ---
 
@@ -198,6 +221,7 @@ You can adapt it to your needs; if you plan to publish it, consider adding an ex
 
 - **Repository**: `https://github.com/SilvanoMarini/ContactManager`
 - **Author GitHub**: `https://github.com/SilvanoMarini`
+- **LinkedIn**: `https://www.linkedin.com/in/silvanomarini`
 
 ## Contact
 
