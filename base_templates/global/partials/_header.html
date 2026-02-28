@@ -1,46 +1,39 @@
-  <header class="header">
-    <h1 class="header-heading">
-      <a href="{% url "contacts:index" %}" class="header-link">
-        Contact Manager
-      </a>
-    </h1>
+<header class="header">
+  <h1 class="header-heading">
+    <a href="{% url "contacts:index" %}" class="header-link">
+      Contact Manager
+    </a>
+  </h1>
 
-    <nav class="menu">
-      <ul class="menu-list">
+  <div class="header-right">
+    {% if user.is_authenticated %}
+      <span class="user-name">Hello, {{ user.first_name|default:user.username }}!</span>
+      <a href="{% url "contacts:logout" %}" class="menu-link logout-link">Logout</a>
+    {% else %}
+      <a href="{% url "contacts:login" %}" class="menu-link">Login</a>
+      <a href="{% url "contacts:register" %}" class="menu-link">Register</a>
+    {% endif %}
+  </div>
 
-        {% if user.is_authenticated %}
-          <li class="menu-item">
-            <a href="{% url "contacts:create" %}" class="menu-link">+ Add Contact</a>
-          </li>
-          <li class="menu-item">
-            <a href="{% url "contacts:user_update" %}" class="menu-link">Profile</a>
-          </li>
-          <li class="menu-item">
-            <a href="{% url "contacts:login" %}" class="menu-link">Logout</a>
-          </li>
-        {% else %}
-          <li class="menu-item">
-            <a href="{% url "contacts:register" %}" class="menu-link">Register</a>
-          </li>
-          <li class="menu-item">
-            <a href="{% url "contacts:login" %}" class="menu-link">Login</a>
-          </li>
-        {% endif %}
-      </ul>
-    </nav>
+  <nav class="menu">
+    <ul class="menu-list">
+      {% if user.is_authenticated %}
+        <li class="menu-item">
+          <a href="{% url "contacts:create" %}" class="menu-link">+ Add Contact</a>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
 
-    <div class="search">
-      <form 
-        action="{% url "contacts:search" %}"
-        method="GET" >
-        <input 
-          type="search"
-          class="search-input" 
-          placeholder="Search..."
-          name="q"
-          id="search"
-          value= "{{ searched_contact }}"
-          >
-      </form>
-    </div>
-  </header>
+  <div class="search">
+    <form action="{% url "contacts:search" %}" method="GET">
+      <input 
+        type="search"
+        class="search-input" 
+        placeholder="Search..."
+        name="q"
+        value="{{ searched_contact }}"
+      >
+    </form>
+  </div>
+</header>
