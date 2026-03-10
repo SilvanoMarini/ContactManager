@@ -1,5 +1,6 @@
 from django.urls import path
 from contacts import views
+from contacts import views
 
 
 app_name = 'contacts'
@@ -8,6 +9,7 @@ urlpatterns = [
     path('', views.home, name='home'),
     path('contacts/', views.index, name='index'),
     path('search/', views.search, name='search'),
+    path('health/', views.health, name='health'),
 
     # contact(CRUD)
     path('contact/<int:contact_id>/', views.contact, name='contact'),
